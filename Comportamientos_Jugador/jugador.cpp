@@ -356,7 +356,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 	while (!open.empty()) {
 		cout << "Obteniendo sig" << '\t';
-		Nodo current = *(open.begin());
+		Nodo current = open.begin()->second;
 		list<Nodo>::iterator it;
 
 		closed.insert(current);
