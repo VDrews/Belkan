@@ -47,12 +47,12 @@ bool Heap<T> :: contains(Nodo el) {
 
 template <class T>
 Nodo Heap<T> :: nearest() {
-  int hCost = 99999999999;
-  Nodo n();
+  int hCost = list[0].hCost;
+  Nodo n(list[0]);
   #pragma omp parallel 
   {
     #pragma omp for nowait
-    for(int i = 0; i < list.size(); ++i) {
+    for(int i = 1; i < list.size(); ++i) {
       if (list[i].hCost <= hCost) {
         n = list[i];
         hCost = list[i].hCost();
