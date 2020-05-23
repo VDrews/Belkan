@@ -399,7 +399,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 							VisualizaPlan(origen, plan);
 							return true;
 						}
-						else if (closed.size() >= 400) {
+						else if (closed.size() >= 800) {
 							auto stop = high_resolution_clock::now();
 							auto duration = duration_cast<microseconds>(stop - start);
 							cout << "T. Ejecucion: " << duration.count() << endl;
