@@ -1,0 +1,24 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "iterator": "cpp",
+        "set": "cpp",
+        "random": "cpp",
+        "ostream": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "locale": "cpp"
+    }
+}
