@@ -400,14 +400,12 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 					// giroToAction(it->giro, plan);
 
 					if (!found) {
-						cout << "Insert" << endl;
 						open.insert(pair<int,Nodo>(it->gCost, *it));
-						cout << "Insert OK" << endl;
 
 						if (*it == *nodoDestino) {
-							cout << "Inside" << endl;
+							
 							auto stop = high_resolution_clock::now();
-							cout << "Stoptime" << endl;
+							
 							auto duration = duration_cast<microseconds>(stop - start);
 							cout << "T. Ejecucion: " << duration.count() << endl;
 
