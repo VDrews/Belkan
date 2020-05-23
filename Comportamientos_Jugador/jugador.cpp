@@ -113,9 +113,9 @@ Action ComportamientoJugador::think(Sensores sensores) {
 	actual.columna     = sensores.posC;
 	actual.orientacion = sensores.sentido;
 
-	cout << "Fila: " << actual.fila << endl;
-	cout << "Col : " << actual.columna << endl;
-	cout << "Ori : " << actual.orientacion << endl;
+	// cout << "Fila: " << actual.fila << endl;
+	// cout << "Col : " << actual.columna << endl;
+	// cout << "Ori : " << actual.orientacion << endl;
 
 	if (sensores.bateria <= 500 && bateriaEncontrada) {
 		destino.fila       = bateria.fila;
@@ -155,7 +155,7 @@ Action ComportamientoJugador::think(Sensores sensores) {
 		}
 	}
 
-	cout << "FRONT: " << sensores.terreno[2] << endl;
+	// cout << "FRONT: " << sensores.terreno[2] << endl;
 
 	if (sensores.nivel == 4) {
 		mapear(sensores);
@@ -172,7 +172,7 @@ Action ComportamientoJugador::think(Sensores sensores) {
 	if (sensores.terreno[0] == 'D') has_zapatillas = true;
 
   Actiones++;
-  cout << "Actiones realizadas: " << Actiones << endl;
+  // cout << "Actiones realizadas: " << Actiones << endl;
   Action = plan.front();
   plan.pop_front();
   return Action;
@@ -339,7 +339,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 	open.insert(*nodoOrigen);
 
 	while (!open.empty()) {
-		cout << "Obteniendo sig" << '\t';
+		// cout << "Obteniendo sig" << '\t';
 		Nodo current = open.remove();
 		list<Nodo>::iterator it;
 
@@ -351,7 +351,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 		list <Nodo> vecinos;
 
 		// current.debug();
-			cout << "Get Vecinos" << '\t';
+			// cout << "Get Vecinos" << '\t';
 		GetVecinos(&current, vecinos, conBateria);
 
 		for(it = vecinos.begin(); it != vecinos.end(); ++it) {
@@ -376,14 +376,14 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 				bool found = (open.contains(*it));
 				// cout << costeDeMoverseAlVecino << "\t" << it->gCost << endl;
 				if (costeDeMoverseAlVecino < it->gCost || !found) {
-					cout << "Entra" << '\t';
+					// cout << "Entra" << '\t';
 					it->gCost = costeDeMoverseAlVecino;
 					it->hCost = distancia(*it, *nodoDestino);
 					it->insertParent(new Nodo(current));
 					// giroToAction(it->giro, plan);
 
 					if (!found) {
-						cout << "Insert" << '\t';
+						// cout << "Insert" << '\t';
 						open.insert(*it);
 
 						if (*it == *nodoDestino) {
@@ -421,7 +421,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 	}
 
-	cout << "Se ha vaciado la lista de candidatos..." << endl;
+	// cout << "Se ha vaciado la lista de candidatos..." << endl;
 	return false;
 
 }
@@ -429,7 +429,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 void ComportamientoJugador::RetrazarPlan(Nodo origen, Nodo destino, list<Action> &plan) {
 	Nodo *current = &destino;
 	while (*(current) != origen) {
-		cout << mapaResultado[current->st.fila][current->st.columna];
+		// cout << mapaResultado[current->st.fila][current->st.columna];
 
 		current->debug();
 
@@ -498,19 +498,19 @@ void ComportamientoJugador::GetVecinos(Nodo *nodo, list<Nodo> &vecinos, bool con
 void ComportamientoJugador::giroToAction(int giro, list<Action> &plan) {
 	if (giro == 1) {
 		plan.push_back(actTURN_R);
-		cout << "Derecha" << endl;
+		// cout << "Derecha" << endl;
 	}
 	else if (giro == -1) {
 		plan.push_back(actTURN_L);
-		cout << "Izquierda" << endl;
+		// cout << "Izquierda" << endl;
 	}
 	else if (giro == 2) {
 		plan.push_back(actTURN_R);
 		plan.push_back(actTURN_R);
-		cout << "Da la vuelta" << endl;
+		// cout << "Da la vuelta" << endl;
 	}
 
-	cout << "Sigue recto" << endl;
+	// cout << "Sigue recto" << endl;
 	plan.push_back(actFORWARD);
 }
 
@@ -587,7 +587,7 @@ struct ComparaEstados{
 // secuencia de Actiones en plan, una lista de Actiones.
 bool ComportamientoJugador::pathFinding_Profundidad(const estado &origen, const estado &destino, list<Action> &plan) {
 	//Borro la lista
-	cout << "Calculando plan\n";
+	// cout << "Calculando plan\n";
 	plan.clear(); // Se limpia el plan creado en el paso anterior
 	set<estado,ComparaEstados> generados; // lista de Cerrados
 	stack<nodo> pila;											// lista de Abiertos
@@ -708,7 +708,7 @@ estado ComportamientoJugador::Alinear(const estado &origen, const estado &destin
 		y = 1;
 	}
 
-	cout << "ALINEANDO: " << "O-" << origen.orientacion << "(" << x << " " << y << ")" << endl;
+	// cout << "ALINEANDO: " << "O-" << origen.orientacion << "(" << x << " " << y << ")" << endl;
 	switch (origen.orientacion)
 	{
 	case 0:
@@ -718,19 +718,19 @@ estado ComportamientoJugador::Alinear(const estado &origen, const estado &destin
 		else if (x == 1) {
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 1) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		else if (x == -1) {
 			plan.push_back(actTURN_L);
 			girado.orientacion = (origen.orientacion - 1) % 4;
-			cout << "Izquierda" << endl;
+			// cout << "Izquierda" << endl;
 		}
 		else if (x == 0) {
 			plan.push_back(actTURN_R);
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 2) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		break;
 	case 1:
@@ -740,19 +740,19 @@ estado ComportamientoJugador::Alinear(const estado &origen, const estado &destin
 		else if (y == 1) {
 			plan.push_back(actTURN_L);
 			girado.orientacion = (origen.orientacion - 1) % 4;
-			cout << "Izquierda" << endl;
+			// cout << "Izquierda" << endl;
 		}
 		else if (y == -1) {
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 1) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		else if (y == 0) {
 			plan.push_back(actTURN_R);
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 2) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		break;
 	case 2:
@@ -762,19 +762,19 @@ estado ComportamientoJugador::Alinear(const estado &origen, const estado &destin
 		else if (x == 1) {
 			plan.push_back(actTURN_L);
 			girado.orientacion = (origen.orientacion - 1) % 4;
-			cout << "Izquierda" << endl;
+			// cout << "Izquierda" << endl;
 		}
 		else if (x == -1) {
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 1) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		else if (x == 0) {
 			plan.push_back(actTURN_R);
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 2) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		break;
 	case 3:
@@ -784,19 +784,19 @@ estado ComportamientoJugador::Alinear(const estado &origen, const estado &destin
 		else if (y == 1) {
 			plan.push_back(actTURN_L);
 			girado.orientacion = (origen.orientacion - 1) % 4;
-			cout << "Izquierda" << endl;
+			// cout << "Izquierda" << endl;
 		}
 		else if (y == -1) {
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 1) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		else if (y == 0) {
 			plan.push_back(actTURN_R);
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 			plan.push_back(actTURN_R);
 			girado.orientacion = (origen.orientacion + 2) % 4;
-			cout << "Derecha" << endl;
+			// cout << "Derecha" << endl;
 		}
 		/* code */
 		break;
