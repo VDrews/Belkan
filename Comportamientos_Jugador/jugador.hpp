@@ -90,10 +90,10 @@ class Nodo {
       if (sensores.bateria <= 400 && sensores.tiempo > 500) return -2000;
       else return -100;
     case 'K':
-      if (sensores.nivel == 4 && !has_bikini && !bikini) return -800; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
+      if (sensores.nivel == 4 && !has_bikini && !bikini) return -2000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
       else return 1;
     case 'D':
-      if (sensores.nivel == 4 && !has_zapatillas && !zapatillas) return -800; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
+      if (sensores.nivel == 4 && !has_zapatillas && !zapatillas) return -2000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
       else return 1;
     case 'T':
       return 2;

@@ -399,20 +399,20 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 							VisualizaPlan(origen, plan);
 							return true;
 						}
-						else if (closed.size() >= 800) {
-							auto stop = high_resolution_clock::now();
-							auto duration = duration_cast<microseconds>(stop - start);
-							cout << "T. Ejecucion: " << duration.count() << endl;
+						// else if (closed.size() >= 800) {
+						// 	auto stop = high_resolution_clock::now();
+						// 	auto duration = duration_cast<microseconds>(stop - start);
+						// 	cout << "T. Ejecucion: " << duration.count() << endl;
 
-							cout << "HA EMPEZADO A TRAZAR EL PLAN SIMPLIFICADO" << endl;
-							RetrazarPlan(*nodoOrigen, open.nearest(), plan);
-							cout << "Longitud del plan: " << plan.size() << endl;
-							PintaPlan(plan);
-							// ver el plan en el mapa
-							VisualizaPlan(origen, plan);
-							return true;
+						// 	cout << "HA EMPEZADO A TRAZAR EL PLAN SIMPLIFICADO" << endl;
+						// 	RetrazarPlan(*nodoOrigen, open.nearest(), plan);
+						// 	cout << "Longitud del plan: " << plan.size() << endl;
+						// 	PintaPlan(plan);
+						// 	// ver el plan en el mapa
+						// 	VisualizaPlan(origen, plan);
+						// 	return true;
 
-						}
+						// }
 					}
 				}
 			}
