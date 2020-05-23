@@ -11,6 +11,7 @@
 #include <set>
 #include <stack>
 #include <cstdlib>
+#include <map> 
 
 using namespace std::chrono;
 bool recargando = false;
@@ -30,6 +31,21 @@ void listarNodos(list<Nodo> &nodos) {
 	for(list<Nodo>::iterator itv = nodos.begin(); itv != nodos.end(); ++itv) {
 		itv->debug();
 	}
+}
+
+bool contains(Nodo nodo, multimap<int, Nodo> &nodos, int key) {
+	auto itr1 = nodos.lower_bound(key); 
+	auto itr2 = nodos.upper_bound(key); 
+		
+	while (itr1 != itr2)     
+	{ 
+		if (itr1->second.st.fila == nodo.st.fila && itr1->second.st.columna == nodo.st.columna) 
+			if (nodo.gCost < itr1->first) {
+				nodos.erase(itr1);
+				nodos.insert(pair<int,Nodo>(nodo.gCost, nodo))
+			}
+			return true;
+	}  
 }
 
 bool contains(Nodo nodo, set<Nodo> &nodos) {
@@ -332,14 +348,15 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 	Nodo *nodoDestino = new Nodo(destino, mapaResultado, conBateria);
 
-	Heap<Nodo> open;
+	// Heap<Nodo> open;
+	multimap <int, Nodo> open;
 	set<Nodo> closed;
 
-	open.insert(*nodoOrigen);
+	open.insert(pair<char,int>(0, *nodoOrigen));
 
 	while (!open.empty()) {
 		cout << "Obteniendo sig" << '\t';
-		Nodo current = open.remove();
+		Nodo current = *(open.begin());
 		list<Nodo>::iterator it;
 
 		closed.insert(current);
@@ -372,7 +389,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 				}
 
 
-				bool found = (open.contains(*it));
+				bool found = contains(*it, open, it->gCost);
 				// cout << costeDeMoverseAlVecino << "\t" << it->gCost << endl;
 				if (costeDeMoverseAlVecino < it->gCost || !found) {
 					// cout << "Entra" << '\t';
@@ -383,7 +400,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 					if (!found) {
 						cout << "Insert" << endl;
-						open.insert(*it);
+						open.insert(pair<char,int>(it->gCost, *it));
 						cout << "Insert OK" << endl;
 
 						if (*it == *nodoDestino) {
