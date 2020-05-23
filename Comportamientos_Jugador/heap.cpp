@@ -19,6 +19,7 @@ public:
   bool contains(Nodo el);
   bool empty();
   T front();
+  Nodo nearest();
   void insert(T );
   T remove();
   int getSize();
@@ -41,6 +42,23 @@ bool Heap<T> :: contains(Nodo el) {
       }
     }
     return false;
+  }
+}
+
+template <class T>
+Nodo Heap<T> :: nearest(Nodo el) {
+  int hCost = 99999999999;
+  Nodo n;
+  #pragma omp parallel 
+  {
+    #pragma omp for nowait
+    for(int i = 0; i < list.size(); ++i) {
+      if (list[i].hCost <= hCost) {
+        n = list[i];
+        hCost = list[i].hCost();
+      }
+    }
+    return n;
   }
 }
 

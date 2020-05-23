@@ -405,7 +405,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 							cout << "T. Ejecucion: " << duration.count() << endl;
 
 							cout << "HA EMPEZADO A TRAZAR EL PLAN SIMPLIFICADO" << endl;
-							RetrazarPlan(*nodoOrigen, open.front(), plan);
+							RetrazarPlan(*nodoOrigen, open.nearest(), plan);
 							cout << "Longitud del plan: " << plan.size() << endl;
 							PintaPlan(plan);
 							// ver el plan en el mapa
