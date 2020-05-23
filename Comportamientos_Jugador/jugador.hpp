@@ -87,7 +87,7 @@ class Nodo {
       }
       break;
     case 'X':
-      if (sensores.bateria <= 400 && sensores.tiempo > 500) return -2000;
+      if (sensores.bateria <= 400 && sensores.tiempo > 500) return -800;
       else return -100;
     case 'K':
       if (sensores.nivel == 4 && !has_bikini && !bikini) return -800; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre

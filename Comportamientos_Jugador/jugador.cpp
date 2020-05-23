@@ -16,6 +16,8 @@ using namespace std::chrono;
 bool recargando = false;
 bool has_bikini = false;
 bool has_zapatillas = false;
+estado bateria;
+bool bateriaEncontrada = false;
 
 int distancia(Nodo a, Nodo b) {
 	int distX = abs(a.st.columna - b.st.columna);
@@ -115,8 +117,14 @@ Action ComportamientoJugador::think(Sensores sensores) {
 	cout << "Col : " << actual.columna << endl;
 	cout << "Ori : " << actual.orientacion << endl;
 
-	destino.fila       = sensores.destinoF;
-	destino.columna    = sensores.destinoC;
+	if (sensores.bateria <= 500 && bateriaEncontrada) {
+		destino.fila       = bateria.fila;
+		destino.columna    = bateria.columna;
+	}
+	else {
+		destino.fila       = sensores.destinoF;
+		destino.columna    = sensores.destinoC;
+	}
 
 	if (destino.columna == actual.columna && destino.fila == actual.fila) {
 		return actIDLE;
@@ -131,6 +139,7 @@ Action ComportamientoJugador::think(Sensores sensores) {
 			bool hay_plan = pathFinding(3, actual, destino, plan, sensores);
 		}
 	}
+
 
 	else if (HayAldeanoDelante(actual)) return actIDLE;
 
@@ -170,8 +179,20 @@ Action ComportamientoJugador::think(Sensores sensores) {
 }
 
 void ComportamientoJugador::mapear(Sensores sensores) {
+
 	switch(sensores.sentido) {
 		case 0:
+			if (!bateriaEncontrada) {
+				for (int i  = 0; i<4; i++){
+					for(int j = -3; j<4; j++){
+						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
+							bateria.columna =sensores.posC+j;
+							bateria.fila = sensores.posF-i;
+							bateriaEncontrada=true;
+						}
+					}
+				}
+			}
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
 			mapaResultado[sensores.posF-1][sensores.posC-1] = sensores.terreno[1];
 			mapaResultado[sensores.posF-1][sensores.posC] = sensores.terreno[2];
@@ -190,6 +211,17 @@ void ComportamientoJugador::mapear(Sensores sensores) {
 			mapaResultado[sensores.posF-3][sensores.posC+3] = sensores.terreno[15];
 			break;
 		case 1:
+			if (!bateriaEncontrada) {
+				for (int i  = -3; i<4; i++){
+					for(int j = 0; j<4; j++){
+						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
+							bateria.columna =sensores.posC+j;
+							bateria.fila = sensores.posF-i;
+							bateriaEncontrada=true;
+						}
+					}
+				}
+			}
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
 			mapaResultado[sensores.posF-1][sensores.posC+1] = sensores.terreno[1];
 			mapaResultado[sensores.posF][sensores.posC+1] = sensores.terreno[2];
@@ -208,6 +240,17 @@ void ComportamientoJugador::mapear(Sensores sensores) {
 			mapaResultado[sensores.posF+3][sensores.posC+3] = sensores.terreno[15];
 			break;
 		case 2:
+			if (!bateriaEncontrada) {
+				for (int i  = 0; i<4; i++){
+					for(int j = -3; j<4; j++){
+						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
+							bateria.columna =sensores.posC+j;
+							bateria.fila = sensores.posF-i;
+							bateriaEncontrada=true;
+						}
+					}
+				}
+			}
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
 			mapaResultado[sensores.posF+1][sensores.posC+1] = sensores.terreno[1];
 			mapaResultado[sensores.posF+1][sensores.posC] = sensores.terreno[2];
@@ -226,6 +269,17 @@ void ComportamientoJugador::mapear(Sensores sensores) {
 			mapaResultado[sensores.posF+3][sensores.posC-3] = sensores.terreno[15];
 			break;
 		case 3:
+			if (!bateriaEncontrada) {
+				for (int i  = -3; i<4; i++){
+					for(int j = -3; j<1; j++){
+						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
+							bateria.columna =sensores.posC+j;
+							bateria.fila = sensores.posF-i;
+							bateriaEncontrada=true;
+						}
+					}
+				}
+			}
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
 			mapaResultado[sensores.posF+1][sensores.posC-1] = sensores.terreno[1];
 			mapaResultado[sensores.posF][sensores.posC-1] = sensores.terreno[2];
@@ -345,13 +399,13 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 							VisualizaPlan(origen, plan);
 							return true;
 						}
-						else if (closed.size() >= 200) {
+						else if (closed.size() >= 400) {
 							auto stop = high_resolution_clock::now();
 							auto duration = duration_cast<microseconds>(stop - start);
 							cout << "T. Ejecucion: " << duration.count() << endl;
 
 							cout << "HA EMPEZADO A TRAZAR EL PLAN SIMPLIFICADO" << endl;
-							RetrazarPlan(*nodoOrigen, closed., plan);
+							RetrazarPlan(*nodoOrigen, *(closed.begin()), plan);
 							cout << "Longitud del plan: " << plan.size() << endl;
 							PintaPlan(plan);
 							// ver el plan en el mapa
