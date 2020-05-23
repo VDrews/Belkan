@@ -360,6 +360,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 		list<Nodo>::iterator it;
 
 		closed.insert(current);
+		open.erase(open.begin());
 		cout << closed.size() << '\t';
 
 		current.debug();
