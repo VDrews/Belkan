@@ -42,7 +42,7 @@ bool contains(Nodo nodo, multimap<int, Nodo> &nodos, int key) {
 		if (itr1->second.st.fila == nodo.st.fila && itr1->second.st.columna == nodo.st.columna) 
 			if (nodo.gCost < itr1->first) {
 				nodos.erase(itr1);
-				nodos.insert(pair<int,Nodo>(nodo.gCost, nodo))
+				nodos.insert(pair<int,Nodo>(nodo.gCost, nodo));
 			}
 			return true;
 	}  
@@ -352,7 +352,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 	multimap <int, Nodo> open;
 	set<Nodo> closed;
 
-	open.insert(pair<char,int>(0, *nodoOrigen));
+	open.insert(pair<int,Nodo>(0, *nodoOrigen));
 
 	while (!open.empty()) {
 		cout << "Obteniendo sig" << '\t';
@@ -400,7 +400,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 					if (!found) {
 						cout << "Insert" << endl;
-						open.insert(pair<char,int>(it->gCost, *it));
+						open.insert(pair<int,Nodo>(it->gCost, *it));
 						cout << "Insert OK" << endl;
 
 						if (*it == *nodoDestino) {
