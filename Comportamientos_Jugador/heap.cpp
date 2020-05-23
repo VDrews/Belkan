@@ -55,7 +55,7 @@ Nodo Heap<T> :: nearest() {
     for(int i = 1; i < list.size(); ++i) {
       if (list[i].hCost <= hCost) {
         n = list[i];
-        hCost = list[i].hCost();
+        hCost = list[i].hCost;
       }
     }
     return n;
