@@ -48,7 +48,7 @@ bool Heap<T> :: contains(Nodo el) {
 template <class T>
 Nodo Heap<T> :: nearest() {
   int hCost = 99999999999;
-  Nodo n;
+  Nodo n = new Nodo();
   #pragma omp parallel 
   {
     #pragma omp for nowait
