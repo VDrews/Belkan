@@ -356,7 +356,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 		for(it = vecinos.begin(); it != vecinos.end(); ++it) {
 			// Si el vecino es transitable y no esta en la lista de cerrados
-			cout << "C. Terr" << '\t';
+			// cout << "C. Terr" << '\t';
 			int coste = it->costeTerreno(sensores, has_bikini, has_zapatillas);
 			if (coste == NULL) continue;
 			if(it->transitable(mapaResultado) && (!contains(*it, closed))) {
