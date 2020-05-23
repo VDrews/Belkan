@@ -18,7 +18,7 @@ public:
   Heap();
   bool contains(Nodo el);
   bool empty();
-  T begin();
+  T front();
   void insert(T );
   T remove();
   int getSize();
@@ -55,7 +55,7 @@ bool Heap<T> :: empty() {
 }
 
 template <class T>
-T Heap<T> :: begin() {
+T Heap<T> :: front() {
     return list[0];
 }
 
