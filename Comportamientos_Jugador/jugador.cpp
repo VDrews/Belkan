@@ -351,23 +351,14 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 		// current.debug();
 			// cout << "Get Vecinos" << '\t';
-		auto tvecinosStart = high_resolution_clock::now();
 		GetVecinos(&current, vecinos, conBateria);
-		auto tvecinosEnd = high_resolution_clock::now();
-		auto durationVecinos = duration_cast<microseconds>(tvecinosEnd - tvecinosStart);
-		cout << "T. Ejecucion Vecinos: " << durationVecinos.count() << endl;
 
 		for(it = vecinos.begin(); it != vecinos.end(); ++it) {
 			// Si el vecino es transitable y no esta en la lista de cerrados
 			// cout << "C. Terr" << '\t';
 			int coste = it->costeTerreno(sensores, has_bikini, has_zapatillas);
 			if (coste == NULL) continue;
-			auto tclosedStart = high_resolution_clock::now();
-			bool contain = (!contains(*it, closed));
-			auto tclosedEnd = high_resolution_clock::now();
-			auto durationClosed = duration_cast<microseconds>(tclosedStart - tclosedStart);
-			cout << "T. Ejecucion Closed Contains: " << durationClosed.count() << endl;
-			if(it->transitable(mapaResultado) && contain) {
+			if(it->transitable(mapaResultado) && (!contains(*it, closed))) {
 
 				int costeDeMoverseAlVecino;
 				if (it->giro == 0) {
@@ -380,11 +371,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 					costeDeMoverseAlVecino = current.gCost + 3* (coste);
 				}
 
-				auto topenStart = high_resolution_clock::now();
-				bool contain = (!contains(*it, closed));
-				auto topenEnd = high_resolution_clock::now();
-				auto durationOpen = duration_cast<microseconds>(topenStart - topenEnd);
-				cout << "T. Ejecucion Open Contains: " << durationOpen.count() << endl;
+
 				bool found = (open.contains(*it));
 				// cout << costeDeMoverseAlVecino << "\t" << it->gCost << endl;
 				if (costeDeMoverseAlVecino < it->gCost || !found) {
