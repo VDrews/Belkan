@@ -25,6 +25,7 @@ class Nodo {
 	Nodo *parent;
 	int giro = 0; //Gira a la izquierda si -1 y a la derecha si 1, 2 para dar la vuelta
 
+  // Instancia un nodo a partir de su estado
 	Nodo(estado entrada, vector< vector< unsigned char> > &mapaResultado, bool bateria) {
 		st = entrada;
     parent = NULL;
@@ -38,6 +39,7 @@ class Nodo {
     }
 	}
 
+  // Constructor de copia
   Nodo(const Nodo &copy) {
     Nodo *padre = copy.parent;
     bikini = copy.bikini;
@@ -62,14 +64,16 @@ class Nodo {
     else return 0;
   }
 
+  // Calcula el coste del suelo
   int costeTerreno(Sensores sensores, bool has_bikini, bool has_zapatillas) {
+    // Si estamos en Anchura, todas las casillas cuestan igual
     if (!conBateria) {
       return 1;
     }
 
     switch (mapa[st.fila][st.columna])
     {
-
+      // Si tiene Bikini, el coste se reduce
     case 'A':
       if (bikini) {
         return 10;
@@ -78,6 +82,7 @@ class Nodo {
         return 100;
       }
       break;
+    // Si tiene Bikini, el coste se reduce
     case 'B':
       if (zapatillas) {
         return 5;
@@ -86,13 +91,18 @@ class Nodo {
         return 50;
       }
       break;
+    // Si la bateria está medianamente cerca y la bateria esta baja, pasará por la bateria
     case 'X':
       return -8000 + sensores.bateria;
+    
+    // Si no tenemos bikini o si no se ha cogido durante este plan, le damos mucha prioridad para cogerlo
     case 'K':
-      if (sensores.nivel == 4 && !has_bikini && !bikini) return -6000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
+      if (sensores.nivel == 4 && !has_bikini && !bikini) return -10000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
       else return 1;
+
+    // Si no tenemos zapatillas o si no se ha cogido durante este plan, le damos mucha prioridad para cogerlo
     case 'D':
-      if (sensores.nivel == 4 && !has_zapatillas && !zapatillas) return -6000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
+      if (sensores.nivel == 4 && !has_zapatillas && !zapatillas) return -10000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
       else return 1;
     case 'T':
       return 2;
@@ -105,8 +115,8 @@ class Nodo {
     case 'S':
       return 1;
       break;
+    // Bajo la indeterminación de no saber que casilla es, lo consideraremos como la media de los costes
     case '?':
-      // Bajo la indeterminación de no saber que casilla es, lo consideraremos como la media de los costes
       return 40;
       break;
     default:
@@ -128,9 +138,9 @@ class Nodo {
 
   void debugWithoutParent() {
     cout << st.orientacion << "(" << st.columna << " " << st.fila << ")" << "\tGiro: " << giro << "\tG:" << gCost << "\tH:" << hCost << endl;
-
   }
 
+  // Añade un padre al nodo
   void insertParent(Nodo *nodo) {
     this->parent = nodo;
   }
@@ -167,9 +177,6 @@ class Nodo {
 
 	bool operator == (const Nodo& s) const { return st.columna == s.st.columna and st.fila == s.st.fila; }
 	bool operator != (const Nodo& s) const { return st.columna != s.st.columna or st.fila != s.st.fila; }
-	bool transitable(const vector< vector< unsigned char> > &mapa) {
-		return mapa[st.fila][st.columna] != 'M' && mapa[st.columna][st.fila] != 'P';
-	}
 };
 
 class comparaNodos

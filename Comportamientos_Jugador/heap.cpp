@@ -32,6 +32,8 @@ Heap<T> :: Heap(){
 }
 
 template <class T>
+
+// Recorre el heap buscando el nodo pasado por parametro
 bool Heap<T> :: contains(Nodo el) {
   #pragma omp parallel 
   {
@@ -45,6 +47,8 @@ bool Heap<T> :: contains(Nodo el) {
   }
 }
 
+// Busca el nodo con menor hCost
+// Usado para trocear el plan
 template <class T>
 Nodo Heap<T> :: nearest() {
   int hCost = list[0].hCost;
@@ -77,6 +81,7 @@ T Heap<T> :: front() {
     return list[0];
 }
 
+// Intercambiamos los elementos de los indices
 template <class T>
 void Heap<T>::swap(int child, int parent) {
   
@@ -87,6 +92,7 @@ void Heap<T>::swap(int child, int parent) {
 
 }
 
+// Obtenemos el padre
 template <class T>
 int Heap<T> :: getParent(int child) {
   if (child % 2 == 0)
@@ -96,16 +102,19 @@ int Heap<T> :: getParent(int child) {
   
 }
 
+// Obtenemos el hijo a la izquierda del padre
 template <class T>
 int Heap<T> :: getLeftChild(int parent){
   return 2*parent +1;
 }
 
+// Obtenemos el hijo a la derecha del padre
 template <class T>
 int Heap<T> :: getRightChild(int parent){
   return 2 * parent + 2;
 }
 
+// Inserta un elemento al Heap y lo reordena
 template <class T>
 void Heap<T> :: insert(T value) {
   list.push_back(value);
@@ -114,6 +123,7 @@ void Heap<T> :: insert(T value) {
 
 }
 
+// Sube el elemento mientras que el hijo sea mayor que el padre
 template <class T>
 void Heap <T>:: bubbleUp() {
   
@@ -135,6 +145,7 @@ void Heap <T>:: bubbleUp() {
 }
 
 
+// Elimina el primer elemento y lo devuelve
 template <class T>
 T Heap<T> :: remove() {
   int child = list.size()  - 1;

@@ -422,15 +422,15 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 	}
 
-	// cout << "Se ha vaciado la lista de candidatos..." << endl;
+	cout << "Se ha vaciado la lista de candidatos..." << endl;
 	return false;
 
 }
 
+// Dado un destino y un origen, traza todo el trayecto recorriendo todos los padres de los nodos
 void ComportamientoJugador::RetrazarPlan(Nodo origen, Nodo destino, list<Action> &plan) {
 	Nodo *current = &destino;
 	while (*(current) != origen) {
-		// cout << mapaResultado[current->st.fila][current->st.columna];
 
 		current->debug();
 
