@@ -19,13 +19,21 @@ bool recargando = false;
 
 // Indica si se ha cogido el bikini ya
 bool has_bikini = false;
+bool busca_bikini = false;
 
 // Indica si se ha cogido las zapatillas ya
 bool has_zapatillas = false;
+bool busca_zapatillas = false;
 
 // Si se encuentra una bateria en el mapa, lo guardaremos aqui
 estado bateria;
 bool bateriaEncontrada = false;
+
+estado bikiniGuardado;
+bool bikiniEncontrado = false;
+
+estado zapatillasGuardadas;
+bool zapatillasEncontradas = false;
 
 
 // Calcula la distancia entre dos nodos
@@ -118,6 +126,35 @@ Action ComportamientoJugador::think(Sensores sensores) {
 		return actIDLE;
 	}
 
+	// Si hay un obstaculo delante y el jugador quiere seguir hacia delante
+	// O si va a entrar en una casilla de agua o de bosque
+	// Recalcula el plan
+	// Esto no se hará si la casilla en la que se encuentra ahora mismo es una bateria
+	if (sensores.nivel == 4 && sensores.terreno[0] != 'X') {
+		if (HayObstaculoDelante(actual) && plan.front() == actFORWARD) {
+			bool hay_plan = pathFinding(3, actual, destino, plan, sensores);
+		}
+		else if ((sensores.terreno[0] != 'A' && sensores.terreno[2] == 'A' && plan.front() == actFORWARD) || busca_bikini) {
+			if (bikiniEncontrado && !has_bikini) {
+				busca_bikini = true;
+				bool hay_plan = pathFinding(3, actual, bikiniGuardado, plan, sensores);
+			}
+			else {
+				bool hay_plan = pathFinding(3, actual, destino, plan, sensores);
+			}
+		}
+		else if (sensores.terreno[0] != 'B' && sensores.terreno[2] == 'B' && plan.front() == actFORWARD) {
+			if (zapatillasEncontradas && !has_zapatillas) {
+				busca_zapatillas = true;
+				bool hay_plan = pathFinding(3, actual, zapatillasGuardadas, plan, sensores);
+			}
+			else {
+				bool hay_plan = pathFinding(3, actual, destino, plan, sensores);
+			}
+
+		}
+	}
+
 	// Si el plan está vacío, genera un plan
 	if (plan.empty()) {
 		if (sensores.nivel != 4){
@@ -131,22 +168,6 @@ Action ComportamientoJugador::think(Sensores sensores) {
 
 	// Si hay un aldeano en frente, se espera a que se quite
 	else if (sensores.superficie[2] == 'a') return actIDLE;
-
-	// Si hay un obstaculo delante y el jugador quiere seguir hacia delante
-	// O si va a entrar en una casilla de agua o de bosque
-	// Recalcula el plan
-	// Esto no se hará si la casilla en la que se encuentra ahora mismo es una bateria
-	else if (((HayObstaculoDelante(actual) && plan.front() == actFORWARD) || 
-	(sensores.terreno[0] != 'A' && sensores.terreno[2] == 'A' && plan.front() == actFORWARD) || 
-	(sensores.terreno[0] != 'B' && sensores.terreno[2] == 'B' && plan.front() == actFORWARD)) && sensores.terreno[0] != 'X') {
-		if (sensores.nivel != 4){
-			bool hay_plan = pathFinding(sensores.nivel, actual, destino, plan, sensores);
-		}
-		else {
-			// Estoy en el nivel 2
-			bool hay_plan = pathFinding(3, actual, destino, plan, sensores);
-		}
-	}
 
 	// Si estamos en nivel 4, pintamos en el mapa las casillas que se van viendo
 	if (sensores.nivel == 4) {
@@ -163,8 +184,14 @@ Action ComportamientoJugador::think(Sensores sensores) {
 	if (sensores.terreno[0] != 'X') recargando = false;
 
 	// Actualizamos bikini y zapatillas si estamos encima de alguna
-	if (sensores.terreno[0] == 'K') has_bikini = true;
-	if (sensores.terreno[0] == 'D') has_zapatillas = true;
+	if (sensores.terreno[0] == 'K') {
+		has_bikini = true;
+		busca_bikini = false;
+	}
+	if (sensores.terreno[0] == 'D') {
+		has_zapatillas = true;
+		busca_zapatillas = false;
+	}
 
   Actiones++;
 
@@ -178,15 +205,23 @@ void ComportamientoJugador::mapear(Sensores sensores) {
 
 	switch(sensores.sentido) {
 		case 0:
-			if (!bateriaEncontrada) {
 				for (int i  = 0; i<4; i++){
 					for(int j = -3; j<4; j++){
-						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
+						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X'){
 							bateria.columna =sensores.posC+j;
 							bateria.fila = sensores.posF-i;
 							bateriaEncontrada=true;
 						}
-					}
+						else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'K'){
+							bikiniGuardado.columna =sensores.posC+j;
+							bikiniGuardado.fila = sensores.posF-i;
+							bikiniEncontrado=true;
+						}
+						else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'D'){
+							zapatillasGuardadas.columna =sensores.posC+j;
+							zapatillasGuardadas.fila = sensores.posF-i;
+							zapatillasEncontradas=true;
+						}
 				}
 			}
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
@@ -207,16 +242,25 @@ void ComportamientoJugador::mapear(Sensores sensores) {
 			mapaResultado[sensores.posF-3][sensores.posC+3] = sensores.terreno[15];
 			break;
 		case 1:
-			if (!bateriaEncontrada) {
 				for (int i  = -3; i<4; i++){
 					for(int j = 0; j<4; j++){
-						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
+						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X'){
 							bateria.columna =sensores.posC+j;
 							bateria.fila = sensores.posF-i;
 							bateriaEncontrada=true;
 						}
+						else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'K'){
+							bikiniGuardado.columna =sensores.posC+j;
+							bikiniGuardado.fila = sensores.posF-i;
+							bikiniEncontrado=true;
+						}
+						else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'D'){
+							zapatillasGuardadas.columna =sensores.posC+j;
+							zapatillasGuardadas.fila = sensores.posF-i;
+							zapatillasEncontradas=true;
+						}
 					}
-				}
+				
 			}
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
 			mapaResultado[sensores.posF-1][sensores.posC+1] = sensores.terreno[1];
@@ -236,17 +280,26 @@ void ComportamientoJugador::mapear(Sensores sensores) {
 			mapaResultado[sensores.posF+3][sensores.posC+3] = sensores.terreno[15];
 			break;
 		case 2:
-			if (!bateriaEncontrada) {
-				for (int i  = 0; i<4; i++){
-					for(int j = -3; j<4; j++){
-						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
-							bateria.columna =sensores.posC+j;
-							bateria.fila = sensores.posF-i;
-							bateriaEncontrada=true;
-						}
+			for (int i  = 0; i<4; i++){
+				for(int j = -3; j<4; j++){
+					if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X'){
+						bateria.columna =sensores.posC+j;
+						bateria.fila = sensores.posF-i;
+						bateriaEncontrada=true;
+					}
+					else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'K'){
+						bikiniGuardado.columna =sensores.posC+j;
+						bikiniGuardado.fila = sensores.posF-i;
+						bikiniEncontrado=true;
+					}
+					else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'D'){
+						zapatillasGuardadas.columna =sensores.posC+j;
+						zapatillasGuardadas.fila = sensores.posF-i;
+						zapatillasEncontradas=true;
 					}
 				}
 			}
+			
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
 			mapaResultado[sensores.posF+1][sensores.posC+1] = sensores.terreno[1];
 			mapaResultado[sensores.posF+1][sensores.posC] = sensores.terreno[2];
@@ -265,17 +318,26 @@ void ComportamientoJugador::mapear(Sensores sensores) {
 			mapaResultado[sensores.posF+3][sensores.posC-3] = sensores.terreno[15];
 			break;
 		case 3:
-			if (!bateriaEncontrada) {
-				for (int i  = -3; i<4; i++){
-					for(int j = -3; j<1; j++){
-						if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X' && !bateriaEncontrada){
-							bateria.columna =sensores.posC+j;
-							bateria.fila = sensores.posF-i;
-							bateriaEncontrada=true;
-						}
+			for (int i  = -3; i<4; i++){
+				for(int j = -3; j<1; j++){
+					if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'X'){
+						bateria.columna =sensores.posC+j;
+						bateria.fila = sensores.posF-i;
+						bateriaEncontrada=true;
+					}
+					else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'K'){
+						bikiniGuardado.columna =sensores.posC+j;
+						bikiniGuardado.fila = sensores.posF-i;
+						bikiniEncontrado=true;
+					}
+					else if(mapaResultado[sensores.posF-i][sensores.posC+j] == 'D'){
+						zapatillasGuardadas.columna =sensores.posC+j;
+						zapatillasGuardadas.fila = sensores.posF-i;
+						zapatillasEncontradas=true;
 					}
 				}
 			}
+			
 			mapaResultado[sensores.posF][sensores.posC] = sensores.terreno[0];
 			mapaResultado[sensores.posF+1][sensores.posC-1] = sensores.terreno[1];
 			mapaResultado[sensores.posF][sensores.posC-1] = sensores.terreno[2];
