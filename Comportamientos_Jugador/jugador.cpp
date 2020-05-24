@@ -400,6 +400,8 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 							return true;
 						}
 						// else if (closed.size() >= 800) {
+
+						// Troceo del plan para no tener que planificar 
 						// 	auto stop = high_resolution_clock::now();
 						// 	auto duration = duration_cast<microseconds>(stop - start);
 						// 	cout << "T. Ejecucion: " << duration.count() << endl;
