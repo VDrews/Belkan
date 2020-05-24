@@ -141,7 +141,7 @@ Action ComportamientoJugador::think(Sensores sensores) {
 	}
 
 
-	else if (sensores.terreno[2] == 'a') return actIDLE;
+	else if (sensores.superficie[2] == 'a') return actIDLE;
 
 	else if (((HayObstaculoDelante(actual) && plan.front() == actFORWARD) || 
 	(sensores.terreno[0] != 'A' && sensores.terreno[2] == 'A' && plan.front() == actFORWARD) || 
