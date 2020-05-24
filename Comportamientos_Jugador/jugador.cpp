@@ -326,39 +326,47 @@ bool ComportamientoJugador::pathFinding (int level, const estado &origen, const 
 // Se llamará para encontrar el plan tanto en C.Uniforme como anchura
 bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &destino, list<Action> &plan, bool conBateria, Sensores sensores) {
 	auto start = high_resolution_clock::now();
+	
+	// Limpiamos el plan
 	plan.clear();
-	Nodo *nodoOrigen = new Nodo(origen, mapaResultado, conBateria);
 
+	Nodo *nodoOrigen = new Nodo(origen, mapaResultado, conBateria);
 	Nodo *nodoDestino = new Nodo(destino, mapaResultado, conBateria);
 
 	Heap<Nodo> open;
 	set<Nodo> closed;
 
+	// Insertamos el nodo de origen en la lista de abiertos
 	open.insert(*nodoOrigen);
 
 	while (!open.empty()) {
-		// cout << "Obteniendo sig" << '\t';
+		// Obtenemos el nodo con menor coste y lo quitamos de la lista de abiertos
 		Nodo current = open.remove();
 		list<Nodo>::iterator it;
 
+		// Lo añadimos en la lista de cerrados
 		closed.insert(current);
-		cout << closed.size() << '\t';
 
 		current.debug();
 
 		list <Nodo> vecinos;
 
-		// current.debug();
-			// cout << "Get Vecinos" << '\t';
 		GetVecinos(&current, vecinos, conBateria);
 
+		// Para cada vecino:
 		for(it = vecinos.begin(); it != vecinos.end(); ++it) {
-			// Si el vecino es transitable y no esta en la lista de cerrados
-			// cout << "C. Terr" << '\t';
+			
+			// Calculamos el coste del terreno
 			int coste = it->costeTerreno(sensores, has_bikini, has_zapatillas);
+			
+			// Descartar si es 'P' o 'M', aunque ya se descarta al obtener los vecinos
 			if (coste == NULL) continue;
-			if(!contains(*it, closed)) {
+			
+			// Si no está en la lista de cerrados
+			bool found = (open.contains(*it));
+			if(!contains(*it, closed) && !found) {
 
+				// Calculamos gCost y hCost
 				int costeDeMoverseAlVecino;
 				if (it->giro == 0) {
 					costeDeMoverseAlVecino = current.gCost + coste;
@@ -370,51 +378,44 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 					costeDeMoverseAlVecino = current.gCost + 3* (coste);
 				}
 
+				it->gCost = costeDeMoverseAlVecino;
+				it->hCost = distancia(*it, *nodoDestino, sensores.nivel);
+				it->insertParent(new Nodo(current));
 
-				bool found = (open.contains(*it));
-				// cout << costeDeMoverseAlVecino << "\t" << it->gCost << endl;
 				if (!found) {
-					// cout << "Entra" << '\t';
-					it->gCost = costeDeMoverseAlVecino;
-					it->hCost = distancia(*it, *nodoDestino, sensores.nivel);
-					it->insertParent(new Nodo(current));
-					// giroToAction(it->giro, plan);
+					open.insert(*it);
 
-					if (!found) {
-						// cout << "Insert" << '\t';
-						open.insert(*it);
+					if (*it == *nodoDestino) {
+						auto stop = high_resolution_clock::now();
+						auto duration = duration_cast<microseconds>(stop - start);
+						cout << "T. Ejecucion: " << duration.count() << endl;
 
-						if (*it == *nodoDestino) {
-							auto stop = high_resolution_clock::now();
-							auto duration = duration_cast<microseconds>(stop - start);
-							cout << "T. Ejecucion: " << duration.count() << endl;
-
-							cout << "HA EMPEZADO A TRAZAR EL PLAN" << endl;
-							RetrazarPlan(*nodoOrigen, *it, plan);
-							cout << "Longitud del plan: " << plan.size() << endl;
-							PintaPlan(plan);
-							// ver el plan en el mapa
-							VisualizaPlan(origen, plan);
-							return true;
-						}
-						// else if (closed.size() >= 800) {
-
-						// Troceo del plan para no tener que planificar 
-						// 	auto stop = high_resolution_clock::now();
-						// 	auto duration = duration_cast<microseconds>(stop - start);
-						// 	cout << "T. Ejecucion: " << duration.count() << endl;
-
-						// 	cout << "HA EMPEZADO A TRAZAR EL PLAN SIMPLIFICADO" << endl;
-						// 	RetrazarPlan(*nodoOrigen, open.nearest(), plan);
-						// 	cout << "Longitud del plan: " << plan.size() << endl;
-						// 	PintaPlan(plan);
-						// 	// ver el plan en el mapa
-						// 	VisualizaPlan(origen, plan);
-						// 	return true;
-
-						// }
+						cout << "HA EMPEZADO A TRAZAR EL PLAN" << endl;
+						RetrazarPlan(*nodoOrigen, *it, plan);
+						cout << "Longitud del plan: " << plan.size() << endl;
+						PintaPlan(plan);
+						// ver el plan en el mapa
+						VisualizaPlan(origen, plan);
+						return true;
 					}
+					// else if (closed.size() >= 800) {
+
+					// Troceo del plan para no tener que planificar 
+					// 	auto stop = high_resolution_clock::now();
+					// 	auto duration = duration_cast<microseconds>(stop - start);
+					// 	cout << "T. Ejecucion: " << duration.count() << endl;
+
+					// 	cout << "HA EMPEZADO A TRAZAR EL PLAN SIMPLIFICADO" << endl;
+					// 	RetrazarPlan(*nodoOrigen, open.nearest(), plan);
+					// 	cout << "Longitud del plan: " << plan.size() << endl;
+					// 	PintaPlan(plan);
+					// 	// ver el plan en el mapa
+					// 	VisualizaPlan(origen, plan);
+					// 	return true;
+
+					// }
 				}
+				
 			}
 		}
 
