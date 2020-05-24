@@ -79,12 +79,12 @@ T Heap<T> :: front() {
 
 template <class T>
 void Heap<T>::swap(int child, int parent) {
-  cout << "SWAP: " << child << '\t' << parent;
-  if (child >= 0 && parent >= 0 && child != parent && child < list.size() && parent < list.size()) {
-    T temp = list[child];
-    list[child] = list[parent];
-    list[parent] = temp;
-  }
+  cout << "ENTRA SWAP" << child << '\t' << parent;
+  T temp = list[child];
+  list[child] = list[parent];
+  list[parent] = temp;
+  cout << "FIN SWAP" << child << '\t' << parent;
+
 }
 
 template <class T>
