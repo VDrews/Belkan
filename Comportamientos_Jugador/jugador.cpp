@@ -19,7 +19,7 @@ bool has_zapatillas = false;
 estado bateria;
 bool bateriaEncontrada = false;
 
-int distancia(Nodo a, Nodo b) {
+int distancia(Nodo a, Nodo b, int nivel) {
 	int distX = abs(a.st.columna - b.st.columna);
 	int distY = abs(a.st.fila - b.st.fila);
 	int multiplicador = (nivel == 4) ? 40 : 1;
@@ -378,7 +378,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 				if (!found) {
 					// cout << "Entra" << '\t';
 					it->gCost = costeDeMoverseAlVecino;
-					it->hCost = distancia(*it, *nodoDestino);
+					it->hCost = distancia(*it, *nodoDestino, sensores.nivel);
 					it->insertParent(new Nodo(current));
 					// giroToAction(it->giro, plan);
 
