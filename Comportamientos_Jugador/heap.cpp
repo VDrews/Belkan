@@ -79,11 +79,11 @@ T Heap<T> :: front() {
 
 template <class T>
 void Heap<T>::swap(int child, int parent) {
-  cout << "ENTRA SWAP" << child << '\t' << parent;
+  cout << "ENTRA SWAP" << child << '\t' << parent << endl;
   T temp = list[child];
   list[child] = list[parent];
   list[parent] = temp;
-  cout << "FIN SWAP" << child << '\t' << parent;
+  cout << "FIN SWAP";
 
 }
 
@@ -122,7 +122,7 @@ void Heap <T>:: bubbleUp() {
   int parent = getParent(child);
   cout << parent << "\t";
   
-  while (list[child] > list[parent] && child >=0 && parent >= 0) {
+  while (child >=0 && parent >= 0 && list[child] > list[parent]) {
   cout << "SWAPPING" << "\n";
 	swap(child, parent);
 	child = parent;
