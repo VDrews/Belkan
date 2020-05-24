@@ -22,8 +22,9 @@ bool bateriaEncontrada = false;
 int distancia(Nodo a, Nodo b) {
 	int distX = abs(a.st.columna - b.st.columna);
 	int distY = abs(a.st.fila - b.st.fila);
+	int multiplicador = (nivel == 4) ? 40 : 1;
 
-	return distX + distY;
+	return (distX + distY) * 1;
 }
 
 void listarNodos(list<Nodo> &nodos) {
@@ -140,7 +141,7 @@ Action ComportamientoJugador::think(Sensores sensores) {
 	}
 
 
-	else if (HayAldeanoDelante(actual)) return actIDLE;
+	else if (sensores.terreno[2] == 'a') return actIDLE;
 
 	else if (((HayObstaculoDelante(actual) && plan.front() == actFORWARD) || 
 	(sensores.terreno[0] != 'A' && sensores.terreno[2] == 'A' && plan.front() == actFORWARD) || 
@@ -358,7 +359,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 			// cout << "C. Terr" << '\t';
 			int coste = it->costeTerreno(sensores, has_bikini, has_zapatillas);
 			if (coste == NULL) continue;
-			if(it->transitable(mapaResultado) && (!contains(*it, closed))) {
+			if(!contains(*it, closed)) {
 
 				int costeDeMoverseAlVecino;
 				if (it->giro == 0) {
@@ -374,7 +375,7 @@ bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &
 
 				bool found = (open.contains(*it));
 				// cout << costeDeMoverseAlVecino << "\t" << it->gCost << endl;
-				if (costeDeMoverseAlVecino < it->gCost || !found) {
+				if (!found) {
 					// cout << "Entra" << '\t';
 					it->gCost = costeDeMoverseAlVecino;
 					it->hCost = distancia(*it, *nodoDestino);
@@ -525,13 +526,6 @@ bool EsObstaculo(unsigned char casilla){
 	  return false;
 }
 
-bool EsAldeano(unsigned char casilla){
-	if (casilla=='a')
-		return true;
-	else
-	  return false;
-}
-
 // Comprueba si la casilla que hay delante es un obstaculo. Si es un
 // obstaculo devuelve true. Si no es un obstaculo, devuelve false y
 // modifica st con la posición de la casilla del avance.
@@ -651,33 +645,6 @@ bool ComportamientoJugador::pathFinding_Profundidad(const estado &origen, const 
 
 
 	return false;
-}
-
-bool ComportamientoJugador::HayAldeanoDelante(estado st){
-	int fil=st.fila, col=st.columna;
-
-  // calculo cual es la casilla de delante del agente
-	switch (st.orientacion) {
-		case 0: fil--; break;
-		case 1: col++; break;
-		case 2: fil++; break;
-		case 3: col--; break;
-	}
-
-	// Compruebo que no me salgo fuera del rango del mapa
-	if (fil<0 or fil>=mapaResultado.size()) return true;
-	if (col<0 or col>=mapaResultado[0].size()) return true;
-
-	// Miro si en esa casilla hay un obstaculo infranqueable
-	if (!EsAldeano(mapaResultado[fil][col])){
-		// No hay obstaculo, actualizo el parámetro st poniendo la casilla de delante.
-    st.fila = fil;
-		st.columna = col;
-		return false;
-	}
-	else{
-	  return true;
-	}
 }
 
 
