@@ -13,26 +13,31 @@
 #include <cstdlib>
 
 using namespace std::chrono;
+
+// Indica si se ha recargado, para no hacer la recarga varias veces consecutivas
 bool recargando = false;
+
+// Indica si se ha cogido el bikini ya
 bool has_bikini = false;
+
+// Indica si se ha cogido las zapatillas ya
 bool has_zapatillas = false;
+
+// Si se encuentra una bateria en el mapa, lo guardaremos aqui
 estado bateria;
 bool bateriaEncontrada = false;
 
+
+// Calcula la distancia entre dos nodos
 int distancia(Nodo a, Nodo b, int nivel) {
 	int distX = abs(a.st.columna - b.st.columna);
 	int distY = abs(a.st.fila - b.st.fila);
-	int multiplicador = (nivel == 4) ? 40 : 1;
 
-	return (distX + distY) * 1;
+	// Lo multiplicamos por el coste medio
+	return (distX + distY) * 40;
 }
 
-void listarNodos(list<Nodo> &nodos) {
-	for(list<Nodo>::iterator itv = nodos.begin(); itv != nodos.end(); ++itv) {
-		itv->debug();
-	}
-}
-
+// Comprueba en paralelo si existe ese nodo en el set
 bool contains(Nodo nodo, set<Nodo> &nodos) {
 	#pragma omp parallel
 	{
@@ -46,6 +51,8 @@ bool contains(Nodo nodo, set<Nodo> &nodos) {
 	}
 }
 
+// Dada la orientacion del jugador, y la dirección en la que se encuentra la casilla (0 -> norte, 1 -> este...)
+// Indica el giro que tendría que hacer para apuntar a esa casilla 0: Recto, 1: Derecha, -1: Izquierda, 2: Da la vuelta
 int girar(int orientacion, int direccionDestino) {
 	if (orientacion == direccionDestino) {
 		return 0;
@@ -77,6 +84,7 @@ int girar(int orientacion, int direccionDestino) {
 	}
 }
 
+// Añade al plan los actIDLE necesarios para recargarse al completo
 void recarga(list<Action> &plan, Sensores sensores) {
 	cout << "RECARGANDO: " << sensores.bateria << endl;
 	for(int batActual = sensores.bateria; batActual < 3000; batActual += 10) {
@@ -85,38 +93,17 @@ void recarga(list<Action> &plan, Sensores sensores) {
 	cout << endl;
 }
 
-
-bool ComportamientoJugador::EsLimite(estado st) {
-	int fil=st.fila, col=st.columna;
-
-	// calculo cual es la casilla de delante del agente
-	switch (st.orientacion) {
-		case 0: fil--; break;
-		case 1: col++; break;
-		case 2: fil++; break;
-		case 3: col--; break;
-	}
-
-	// Compruebo que no me salgo fuera del rango del mapa
-	if (fil<0 or fil>=mapaResultado.size()) return true;
-	if (col<0 or col>=mapaResultado[0].size()) return true;
-}
-
 // Este es el método principal que debe contener los 4 Comportamientos_Jugador
 // que se piden en la práctica. Tiene como entrada la información de los
 // sensores y devuelve la acción a realizar.
 Action ComportamientoJugador::think(Sensores sensores) {
 	Action Action = actIDLE;
-	// Estoy en el nivel 1
 
 	actual.fila        = sensores.posF;
 	actual.columna     = sensores.posC;
 	actual.orientacion = sensores.sentido;
 
-	// cout << "Fila: " << actual.fila << endl;
-	// cout << "Col : " << actual.columna << endl;
-	// cout << "Ori : " << actual.orientacion << endl;
-
+	// Cambia de destino a la bateria si la bateria es baja y conoce alguna cercana
 	if (sensores.bateria <= 500 && bateriaEncontrada) {
 		destino.fila       = bateria.fila;
 		destino.columna    = bateria.columna;
@@ -126,10 +113,12 @@ Action ComportamientoJugador::think(Sensores sensores) {
 		destino.columna    = sensores.destinoC;
 	}
 
+	// Si llega al destino, se espera a que cambie el objetivo
 	if (destino.columna == actual.columna && destino.fila == actual.fila) {
 		return actIDLE;
 	}
 
+	// Si el plan está vacío, genera un plan
 	if (plan.empty()) {
 		if (sensores.nivel != 4){
 			bool hay_plan = pathFinding(sensores.nivel, actual, destino, plan, sensores);
@@ -140,9 +129,13 @@ Action ComportamientoJugador::think(Sensores sensores) {
 		}
 	}
 
-
+	// Si hay un aldeano en frente, se espera a que se quite
 	else if (sensores.superficie[2] == 'a') return actIDLE;
 
+	// Si hay un obstaculo delante y el jugador quiere seguir hacia delante
+	// O si va a entrar en una casilla de agua o de bosque
+	// Recalcula el plan
+	// Esto no se hará si la casilla en la que se encuentra ahora mismo es una bateria
 	else if (((HayObstaculoDelante(actual) && plan.front() == actFORWARD) || 
 	(sensores.terreno[0] != 'A' && sensores.terreno[2] == 'A' && plan.front() == actFORWARD) || 
 	(sensores.terreno[0] != 'B' && sensores.terreno[2] == 'B' && plan.front() == actFORWARD)) && sensores.terreno[0] != 'X') {
@@ -155,29 +148,32 @@ Action ComportamientoJugador::think(Sensores sensores) {
 		}
 	}
 
-	// cout << "FRONT: " << sensores.terreno[2] << endl;
-
+	// Si estamos en nivel 4, pintamos en el mapa las casillas que se van viendo
 	if (sensores.nivel == 4) {
 		mapear(sensores);
 	}
 
+	// Si está encima de la bateria, se pone a recargar
 	if (sensores.terreno[0] == 'X' && !recargando) {
 		recargando = true;
 		recarga(plan, sensores);
 	}
 
+	// Cuando salga de la bateria, se pone recargando otra vez a false
 	if (sensores.terreno[0] != 'X') recargando = false;
 
+	// Actualizamos bikini y zapatillas si estamos encima de alguna
 	if (sensores.terreno[0] == 'K') has_bikini = true;
 	if (sensores.terreno[0] == 'D') has_zapatillas = true;
 
   Actiones++;
-  // cout << "Actiones realizadas: " << Actiones << endl;
+
   Action = plan.front();
   plan.pop_front();
   return Action;
 }
 
+// Busca en los sensores la bateria y pinta en el mapa lo que va viendo
 void ComportamientoJugador::mapear(Sensores sensores) {
 
 	switch(sensores.sentido) {
@@ -326,6 +322,8 @@ bool ComportamientoJugador::pathFinding (int level, const estado &origen, const 
 	return false;
 }
 
+
+// Se llamará para encontrar el plan tanto en C.Uniforme como anchura
 bool ComportamientoJugador::encontrarCamino(const estado &origen, const estado &destino, list<Action> &plan, bool conBateria, Sensores sensores) {
 	auto start = high_resolution_clock::now();
 	plan.clear();
