@@ -87,13 +87,13 @@ class Nodo {
       }
       break;
     case 'X':
-      if (sensores.bateria <= 400) return -2000;
+      if (sensores.bateria <= 400) return -6000;
       else return -100;
     case 'K':
-      if (sensores.nivel == 4 && !has_bikini && !bikini) return -2000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
+      if (sensores.nivel == 4 && !has_bikini && !bikini) return -6000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
       else return 1;
     case 'D':
-      if (sensores.nivel == 4 && !has_zapatillas && !zapatillas) return -2000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
+      if (sensores.nivel == 4 && !has_zapatillas && !zapatillas) return -6000; // Como se va a coger objetivos hasta que se acabe el tiempo, cunde cogerlas siempre
       else return 1;
     case 'T':
       return 2;
@@ -111,7 +111,7 @@ class Nodo {
       return 40;
       break;
     default:
-      return 40;
+      return 1;
       break;
     }
   }
